@@ -23,7 +23,7 @@ esphome:
   on_boot:
     priority: -100
     then:
-      - script.execute: led_red
+      - script.execute: try_led_red
 
 esp32:
   variant: esp32s3
@@ -167,6 +167,7 @@ media_source:
   - platform: sendspin
     id: sendspin_media_source
     buffer_size: 500000
+    static_delay_adjustable: true
 
 media_player:
   - platform: sendspin
@@ -198,6 +199,12 @@ media_player:
     volume_min: 0.4
     volume_max: 0.9
 
+    on_announcement:
+      - mixer_speaker.apply_ducking:
+          id: media_mixing_input
+          decibel_reduction: 20
+          duration: 0.0s
+
     on_state:
       then:
         - lambda: |-
@@ -207,10 +214,20 @@ media_player:
               state == MediaPlayerState::MEDIA_PLAYER_STATE_PLAYING ||
               state == MediaPlayerState::MEDIA_PLAYER_STATE_ANNOUNCING
             ) {
-              id(led_green).execute();
+              id(try_led_green).execute();
             } else {
-              id(led_red).execute();
+              id(try_led_red).execute();
             }
+        - if:
+            condition:
+              not:
+                media_player.is_announcing:
+                  id: external_media_player
+            then:
+              - mixer_speaker.apply_ducking:
+                  id: media_mixing_input
+                  decibel_reduction: 0
+                  duration: 1.0s
 
 script:
   - id: single_click_timer
@@ -261,36 +278,33 @@ script:
               .perform();
           }
 
-  - id: led_red
+  - id: try_led_red
     then:
-      - light.turn_on:
-          id: led
-          red: 100%
-          green: 0%
-          blue: 0%
-          brightness: 100%
+      - if:
+          condition:
+            switch.is_on: led_switch
+          then:
+            - light.turn_on:
+                id: led
+                red: 100%
+                green: 0%
+                blue: 0%
+                brightness: 100%
 
-  - id: led_green
+  - id: try_led_green
     then:
-      - light.turn_on:
-          id: led
-          red: 0%
-          green: 100%
-          blue: 0%
-          brightness: 100%
+      - if:
+          condition:
+            switch.is_on: led_switch
+          then:
+            - light.turn_on:
+                id: led
+                red: 0%
+                green: 100%
+                blue: 0%
+                brightness: 100%
 
 switch:
-  - platform: template
-    id: sendspin_delay_adjustable
-    name: "Sendspin adjustable delay"
-    entity_category: config
-    optimistic: true
-    restore_mode: RESTORE_DEFAULT_OFF
-    turn_on_action:
-      - sendspin.media_source.enable_static_delay_adjustment:
-    turn_off_action:
-      - sendspin.media_source.disable_static_delay_adjustment:
-
   - platform: template
     id: startup_sound_switch
     name: Startup sound
@@ -304,6 +318,16 @@ switch:
     type: unpaired_access
     name: "Sendspin Unpaired Access"
     restore_mode: RESTORE_DEFAULT_ON
+    
+  - platform: template
+    id: led_switch
+    name: Enable LED
+    icon: "mdi:led-outline"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    turn_off_action:
+      - light.turn_off: led
 
 button:
   - platform: restart

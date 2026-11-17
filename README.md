@@ -439,7 +439,7 @@ This is the only device based on esp32-s2 Supermini due to it's battery connecti
 
 This device differs from the others by being an input device instead of an output device.
 
-When the Sendspin Source role is supported in ESPHome, it will allow external audio devices such as turntables, radios, cassette decks, CD players, and other devices with audio output to be connected to Music Assistant and played in sync across your Sendspin devices.
+With Sendspin Source role support now available in ESPHome (through Apollo’s external component until native support lands in 2026.11), you can connect turntables, radios, cassette decks, CD players, and other devices with audio output to Music Assistant and play them in sync across your Sendspin devices.
 
 <img width="1672" height="941" alt="c4d55f96-e3dd-48a5-9ce6-a04c773e3c6e" src="https://github.com/user-attachments/assets/c810e856-2f45-44bd-a786-5c5b1d181fea" />
 
@@ -508,6 +508,84 @@ If using for WLED audio reactive: (note: no hole in 3D case for LED cable)
   [https://www.aliexpress.com/item/1005008243857446.html](https://www.aliexpress.com/item/1005008243857446.html)
 
 * 10 short cords.
+
+---
+
+## SendspinZero-Ear
+
+Now that you have a SendspinZero player, all it needs to become a voice assistant is an ear.
+
+<img width="600" src="https://github.com/user-attachments/assets/506cbe4d-081a-4adc-b5ea-39529329b7b2" />
+
+SendspinZero-Ear is a speakerless voice assistant that uses your existing SendspinZero player as its speaker. It supports a stop word that can end a conversation or silence a ringing timer. You configure which player to use by setting its name on the SendspinZero-Ear device in Home Assistant.
+
+If your player has a display, it continues to show its usual content while the voice assistant is active. You can display the voice assistant phases on a Home Assistant dashboard.
+
+Keeping the microphone separate from the speaker makes it easier for the assistant to hear the wake word while music is playing. It also lets you use the speaker you already have.
+
+
+3D files will be there shortly.
+
+<img width="600" src="https://github.com/user-attachments/assets/9de93b72-2099-4762-8d2a-cc1f4ca1ac81" />
+
+## Pin Mapping
+
+### ESP32-S3 → INMP441
+
+| ESP32S3 Zero  | INMP441 pin  	|
+| ------------- | --------------|
+| GND		| GND+L/R	|
+| 3.3V		| VDD  	|
+| GPIO 4	| WS		|
+| GPIO 5	| SCK		|
+| GPIO 6	| SD		|
+
+
+## Parts List
+
+* **1 × ESP32-S3 Zero**
+  [https://www.aliexpress.com/item/1005009890203011.html](https://www.aliexpress.com/item/1005009890203011.html)
+* 1 × INMP441 microphone
+  [https://www.aliexpress.com/item/1005012097806013.html](https://www.aliexpress.com/item/1005012097806013.html)
+
+---
+
+## SendspinZero-USB
+
+This one is a little different from the other SendspinZero devices. There are no audio components to wire up, just two wires for power!
+
+<img width="300" src="https://github.com/user-attachments/assets/a1c3251e-4798-446e-bf81-f5aaf2e43461" />
+
+<img width="300" src="https://github.com/user-attachments/assets/9e113583-8c35-4b08-a658-ec26416de624" />
+
+You’ll find the 3D files in the [`3D_Files`](3D_Files) folder.
+
+That leaves the Zero’s USB port free for a USB sound card dongle (UAC 1.0). Hook up the dongle’s output to your stereo or powered speakers, plug a 3.5 mm microphone of your choice into its input, and you’ve got a voice assistant, a Sendspin music player, or both.
+
+<img width="600" src="https://github.com/user-attachments/assets/ff348df7-3005-4760-a64b-5793950674b7" />
+
+## Pin Mapping
+
+### ESP32-S3 → USB-C module
+
+| Zero  | USB PLUG |
+| ----- | ---------|
+| GND		| GND 	|
+| 5V  	| 5V  	|
+
+
+## Parts List
+
+* 1 × ESP32-S3 Zero (doh)
+  [https://www.aliexpress.com/item/1005009890203011.html](https://www.aliexpress.com/item/1005009890203011.html)
+* 1 × USC-C module
+  [https://www.aliexpress.com/item/32894272386.html](https://www.aliexpress.com/item/32894272386.html)
+
+This is just the USB-C module I had on hand and what the case is made for. Any USB-C module that provides the 5 V and GND connections we need will do. Leave this module’s TX and RX pins disconnected. They use 5 V logic, and the ESP32-S3 Zero uses 3.3 V logic.
+
+WARNING!, do NOT connect a charger to both usb ports, it can damage the device.
+
+Soundcard dongle i used [https://www.aliexpress.com/item/1005006117722774.html](https://www.aliexpress.com/item/1005006117722774.html)
 
 ---
 
